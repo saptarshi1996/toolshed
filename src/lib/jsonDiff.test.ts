@@ -56,6 +56,8 @@ describe('parseJson', () => {
     ['[1 2]', 1, 'Expected "," or "]"'],
     ['{"a": tru}', 1, 'Unexpected character "t"'],
     ['{"a": 1} x', 1, 'Unexpected content after the document'],
+    ['{"a": 01}', 1, 'Expected "," or "}"'],
+    ['[1.]', 1, 'Expected "," or "]"'],
     ['{"a": "open', 1, 'Unterminated string'],
     ['{"a": [1,', 1, 'Unexpected end of input'],
   ])('reports %j at line %i: %s', (src, line, message) => {
@@ -191,5 +193,19 @@ describe('compareJson', () => {
     const [a, b] = ['{"t":[1,2,3]}', '{"t":[3,1,2]}']
     expect(compareJson(a, b, { sortArrays: false }).changes).not.toHaveLength(0)
     expect(compareJson(a, b, { sortArrays: true }).changes).toEqual([])
+  })
+
+  it('marks the original lines when ignoring array order', () => {
+    const left = '{\n  "t": [\n    3,\n    1,\n    2\n  ]\n}'
+    const right = '{\n  "t": [\n    2,\n    9,\n    1\n  ]\n}'
+    const r = compareJson(left, right, { sortArrays: true })
+    // 3 (left line 3) was removed; 9 (right line 4) was added
+    expect(r.left.marks).toEqual({ 3: 'chg' })
+    expect(r.right.marks).toEqual({ 4: 'chg' })
+  })
+
+  it('does not treat inherited names as keys when ignoring array order', () => {
+    const r = compareJson('{"a":[1]}', '{"a":[1],"constructor":1}', { sortArrays: true })
+    expect(r.changes).toEqual([expect.objectContaining({ kind: 'add', path: 'constructor' })])
   })
 })

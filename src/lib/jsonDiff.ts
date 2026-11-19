@@ -6,6 +6,9 @@ export interface Change {
   path: string
   before?: unknown
   after?: unknown
+  /** Set when arrays were sorted: the path in the original left / right text, used for line marks. */
+  fromPath?: string
+  toPath?: string
 }
 
 /** First and last line (1-based) a value occupies in the source text. */
@@ -122,7 +125,7 @@ export function parseJson(src: string): ParseResult {
     } else if (c === '"') {
       value = readString()
     } else {
-      const m = /^(-?\d+(\.\d+)?([eE][+-]?\d+)?|true|false|null)/.exec(src.slice(i))
+      const m = /^(-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?|true|false|null)/.exec(src.slice(i))
       if (!m) fail(i >= src.length ? 'Unexpected end of input' : `Unexpected character "${c}"`)
       const token = m![0]
       i += token.length
@@ -146,43 +149,72 @@ export function parseJson(src: string): ParseResult {
 
 const typeOf = (v: unknown) => (v === null ? 'null' : Array.isArray(v) ? 'array' : typeof v)
 
-/** Compares two parsed documents by path. Key order never matters. */
-export function diffJson(a: unknown, b: unknown, path = '', out: Change[] = []): Change[] {
+/** For arrays reordered by `sortArrays`: sorted index -> index in the original array. */
+export type Origins = WeakMap<object, number[]>
+
+interface Walk {
+  /** Where the value lives in the original left / right source, for line lookups. */
+  from: string
+  to: string
+}
+
+function walk(a: unknown, b: unknown, path: string, at: Walk, out: Change[], oa?: Origins, ob?: Origins): void {
   const ta = typeOf(a)
+  const track = !!(oa || ob)
+  const emit = (c: Change, w: Walk = at) => out.push(track ? { ...c, fromPath: w.from, toPath: w.to } : c)
   if (ta !== typeOf(b)) {
-    out.push({ kind: 'chg', path, before: a, after: b })
+    emit({ kind: 'chg', path, before: a, after: b })
   } else if (ta === 'object') {
     const x = a as Record<string, unknown>
     const y = b as Record<string, unknown>
     for (const k of Object.keys(x)) {
-      if (k in y) diffJson(x[k], y[k], keyPath(path, k), out)
-      else out.push({ kind: 'del', path: keyPath(path, k), before: x[k] })
+      const p = keyPath(path, k)
+      const next = { from: keyPath(at.from, k), to: keyPath(at.to, k) }
+      if (k in y) walk(x[k], y[k], p, next, out, oa, ob)
+      else emit({ kind: 'del', path: p, before: x[k] }, next)
     }
     for (const k of Object.keys(y)) {
-      if (!(k in x)) out.push({ kind: 'add', path: keyPath(path, k), after: y[k] })
+      if (!(k in x)) emit({ kind: 'add', path: keyPath(path, k), after: y[k] }, { from: keyPath(at.from, k), to: keyPath(at.to, k) })
     }
   } else if (ta === 'array') {
     const x = a as unknown[]
     const y = b as unknown[]
+    const ia = oa?.get(x)
+    const ib = ob?.get(y)
     for (let i = 0; i < Math.max(x.length, y.length); i++) {
       const p = `${path}[${i}]`
-      if (i >= x.length) out.push({ kind: 'add', path: p, after: y[i] })
-      else if (i >= y.length) out.push({ kind: 'del', path: p, before: x[i] })
-      else diffJson(x[i], y[i], p, out)
+      const next = { from: `${at.from}[${ia?.[i] ?? i}]`, to: `${at.to}[${ib?.[i] ?? i}]` }
+      if (i >= x.length) emit({ kind: 'add', path: p, after: y[i] }, next)
+      else if (i >= y.length) emit({ kind: 'del', path: p, before: x[i] }, next)
+      else walk(x[i], y[i], p, next, out, oa, ob)
     }
   } else if (a !== b) {
-    out.push({ kind: 'chg', path, before: a, after: b })
+    emit({ kind: 'chg', path, before: a, after: b })
   }
+}
+
+/** Compares two parsed documents by path. Key order never matters. */
+export function diffJson(a: unknown, b: unknown, path = '', out: Change[] = [], oa?: Origins, ob?: Origins): Change[] {
+  walk(a, b, path, { from: path, to: path }, out, oa, ob)
   return out
 }
 
-/** Sorts every array by its serialised elements, so order stops mattering. */
-export function sortArrays(v: unknown): unknown {
+/**
+ * Sorts every array by its serialised elements, so order stops mattering.
+ * Pass `origins` to learn where each sorted element sat in the original array.
+ */
+export function sortArrays(v: unknown, origins?: Origins): unknown {
   if (Array.isArray(v)) {
-    return v.map(sortArrays).sort((p, q) => (JSON.stringify(p) < JSON.stringify(q) ? -1 : 1))
+    const items = v.map((x, i) => ({ value: sortArrays(x, origins), key: JSON.stringify(sortArrays(x)), i }))
+    items.sort((p, q) => (p.key < q.key ? -1 : p.key > q.key ? 1 : 0))
+    const sorted = items.map((it) => it.value)
+    origins?.set(sorted, items.map((it) => it.i))
+    return sorted
   }
   if (v && typeof v === 'object') {
-    return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, sortArrays(x)]))
+    const out: Record<string, unknown> = Object.create(null)
+    for (const [k, x] of Object.entries(v)) out[k] = sortArrays(x, origins)
+    return out
   }
   return v
 }
@@ -223,13 +255,15 @@ export function compareJson(leftText: string, rightText: string, options: { sort
   const right = side(rightText, r)
   if (!l.ok || !r.ok) return { left, right, changes: null }
 
-  const a = options.sortArrays ? sortArrays(l.value) : l.value
-  const b = options.sortArrays ? sortArrays(r.value) : r.value
-  const changes = diffJson(a, b)
+  const oa: Origins = new WeakMap()
+  const ob: Origins = new WeakMap()
+  const a = options.sortArrays ? sortArrays(l.value, oa) : l.value
+  const b = options.sortArrays ? sortArrays(r.value, ob) : r.value
+  const changes = diffJson(a, b, '', [], oa, ob)
 
   for (const c of changes) {
-    const from = c.kind !== 'add' ? l.spans.get(c.path) : undefined
-    const to = c.kind !== 'del' ? r.spans.get(c.path) : undefined
+    const from = c.kind !== 'add' ? l.spans.get(c.fromPath ?? c.path) : undefined
+    const to = c.kind !== 'del' ? r.spans.get(c.toPath ?? c.path) : undefined
     if (from) for (let n = from.start; n <= from.end; n++) left.marks[n] = c.kind
     if (to) for (let n = to.start; n <= to.end; n++) right.marks[n] = c.kind
   }
