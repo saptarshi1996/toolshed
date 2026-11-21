@@ -23,6 +23,10 @@ interface Props {
   marks: LineMarks
   label: string
   placeholderText?: string
+  /** Selectable and copyable, but not editable. */
+  readOnly?: boolean
+  /** Wrap long lines instead of scrolling sideways. */
+  wrap?: boolean
 }
 
 class MarkGutter extends GutterMarker {
@@ -100,7 +104,7 @@ const highlight = syntaxHighlighting(
   ]),
 )
 
-export function Editor({ value, onChange, marks, label, placeholderText }: Props) {
+export function Editor({ value, onChange, marks, label, placeholderText, readOnly = false, wrap = false }: Props) {
   const host = useRef<HTMLDivElement>(null)
   const view = useRef<EditorView | null>(null)
   const initial = useRef({ value, marks })
@@ -127,6 +131,8 @@ export function Editor({ value, onChange, marks, label, placeholderText }: Props
           markField,
           theme,
           placeholderText ? placeholder(placeholderText) : [],
+          readOnly ? EditorState.readOnly.of(true) : [],
+          wrap ? EditorView.lineWrapping : [],
           EditorView.contentAttributes.of({ 'aria-label': label, spellcheck: 'false' }),
           EditorView.updateListener.of((u) => {
             if (u.docChanged) onChangeRef.current(u.state.doc.toString())
@@ -140,7 +146,7 @@ export function Editor({ value, onChange, marks, label, placeholderText }: Props
       v.destroy()
       view.current = null
     }
-  }, [label, placeholderText])
+  }, [label, placeholderText, readOnly, wrap])
 
   // Replace the document when the value is changed from outside (Format, Clear).
   useEffect(() => {

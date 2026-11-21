@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Editor } from '../../components/Editor'
 import { compareJson, type Change, type SideResult } from '../../lib/jsonDiff'
+import '../../components/ToolPage.css'
 import './Compare.css'
 
 const SAMPLE_LEFT = `{
@@ -178,15 +179,15 @@ export function Compare() {
   }
 
   return (
-    <div className="compare">
-      <div className="compare-head">
+    <div className="tool-page">
+      <div className="tool-head">
         <h1>Compare JSON</h1>
         <label className="switch">
           <input type="checkbox" checked={sort} onChange={(e) => setSort(e.target.checked)} />
           Ignore array order
         </label>
       </div>
-      <p className="compare-sub">
+      <p className="tool-sub">
         Paste two JSON documents to see exactly what was added, removed, or changed.
       </p>
 

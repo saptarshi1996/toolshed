@@ -26,6 +26,12 @@ describe('routing', () => {
     expect(await screen.findByRole('heading', { name: 'Compare JSON' })).toBeInTheDocument()
   })
 
+  it('opens Stringify at /stringify, listed in the sidebar and marked current', async () => {
+    renderAt('/stringify')
+    expect(await screen.findByRole('heading', { name: 'Stringify JSON' })).toBeInTheDocument()
+    expect(within(sidebar()).getByRole('link', { name: 'Stringify' })).toHaveAttribute('aria-current', 'page')
+  })
+
   it('treats a trailing slash as the same page', async () => {
     renderAt('/compare/')
     expect(await screen.findByRole('heading', { name: 'Compare JSON' })).toBeInTheDocument()

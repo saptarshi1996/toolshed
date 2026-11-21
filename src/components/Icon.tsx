@@ -6,6 +6,13 @@ const paths = {
       <path d="M13 11H3.5M6 8.5 3.5 11 6 13.5" />
     </>
   ),
+  // Opening quote marks: text turned into a string.
+  stringify: (
+    <>
+      <path d="M3 7.5V11h3.5V7.5H4.5c0-1.4.7-2.2 2-2.5" />
+      <path d="M9.5 7.5V11H13V7.5h-2c0-1.4.7-2.2 2-2.5" />
+    </>
+  ),
 }
 
 export type IconName = keyof typeof paths

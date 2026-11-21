@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-Toolshed is a browser-only developer toolbox (CyberChef-style, with an Apple-like UI). Nothing the user pastes leaves the browser. Live at https://saptarshi1996.github.io/toolshed/. Only JSON Compare exists so far. More JSON tools and other groups are planned (see `README.md`).
+Toolshed is a browser-only developer toolbox (CyberChef-style, with an Apple-like UI). Nothing the user pastes leaves the browser. Live at https://saptarshi1996.github.io/toolshed/. JSON Compare and JSON Stringify exist so far. More JSON tools and other groups are planned (see `README.md`).
 
 ## Commands
 
@@ -21,6 +21,8 @@ Node version is pinned in `.nvmrc`. Husky runs `lint` + `build` on pre-commit an
 ## Architecture
 
 **Tool registry drives everything.** `src/tools/registry.tsx` holds `groups` (each with `tools`). The sidebar, the routes in `App.tsx`, the document title, and the sidebar search are all derived from it, so adding a tool means adding a registry entry (lazy-loaded `component`, unique `path`, an `icon` key from `components/Icon.tsx`) and nothing else. See "Adding a tool" in `README.md`.
+
+**Shared page layout** (header, switches, side-by-side panes, narrow-window stacking) lives in `src/components/ToolPage.css` (`tool-page`, `tool-head`, `panes`, `pane`...). New tools import it instead of redefining it. `Editor` takes `readOnly` and `wrap` for output panes.
 
 **Logic lives in `src/lib/`, UI in `src/tools/` and `src/components/`.** For JSON Compare, `src/lib/jsonDiff.ts` is pure and unit-tested; `src/tools/json/Compare.tsx` only wires state to it.
 

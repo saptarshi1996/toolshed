@@ -33,6 +33,13 @@ export const groups: ToolGroup[] = [
         icon: 'compare',
         component: lazy(() => import('./json/Compare').then((m) => ({ default: m.Compare }))),
       },
+      {
+        id: 'stringify',
+        name: 'Stringify',
+        path: '/stringify',
+        icon: 'stringify',
+        component: lazy(() => import('./json/Stringify').then((m) => ({ default: m.Stringify }))),
+      },
     ],
   },
 ]

@@ -11,8 +11,9 @@ Everything runs in the browser. Nothing you paste is sent to a server.
 | Group | Tool | Path | Status |
 | ----- | ---- | ---- | ------ |
 | JSON  | Compare | `/compare` | Available |
+| JSON  | Stringify | `/stringify` | Available |
 
-More JSON tools (stringify, parse, format, minify, query, validate) and other groups are planned.
+More JSON tools (parse, format, minify, query, validate) and other groups are planned.
 
 ### JSON Compare
 
@@ -23,6 +24,15 @@ Paste JSON on each side and see exactly what was added, removed, or changed.
 - Changed lines are tinted in both editors, and every difference is listed below with its old and new value.
 - Invalid JSON is reported with the line and message, instead of failing silently.
 - Format and Clear buttons on each side, an option to ignore array order, and a filter for the list of differences.
+
+### JSON Stringify
+
+Turn a JSON document into an escaped string, ready to paste into code or into another JSON value.
+
+- "Minify first" strips whitespace outside strings before escaping. It works on the text, so key order and number precision are untouched.
+- "Wrap in quotes" keeps or drops the surrounding quotes.
+- Invalid JSON is reported with its line, and the output stays empty until it is fixed.
+- The output is read-only, wraps long lines, and has a Copy button.
 
 ## Getting started
 
