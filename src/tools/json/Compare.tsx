@@ -1,32 +1,9 @@
 import { useMemo, useState } from 'react'
+import { CopyButton, PasteButton } from '../../components/ClipboardButtons'
 import { Editor } from '../../components/Editor'
 import { compareJson, type Change, type SideResult } from '../../lib/jsonDiff'
 import '../../components/ToolPage.css'
 import './Compare.css'
-
-const SAMPLE_LEFT = `{
-  "name": "toolshed",
-  "version": "1.4.0",
-  "private": true,
-  "scripts": {
-    "build": "vite build",
-    "test": "vitest"
-  },
-  "tags": ["json", "diff"],
-  "author": { "name": "Ada" }
-}`
-
-const SAMPLE_RIGHT = `{
-  "name": "toolshed",
-  "version": "1.5.0",
-  "scripts": {
-    "build": "vite build",
-    "test": "vitest run",
-    "lint": "eslint ."
-  },
-  "tags": ["json", "diff", "cli"],
-  "author": { "name": "Ada Lovelace" }
-}`
 
 const SYMBOL = { add: '+', del: '−', chg: '~' } as const
 
@@ -44,7 +21,8 @@ function prettify(text: string) {
 }
 
 function status(side: SideResult) {
-  return side.error ? `Line ${side.error.line} · ${side.error.message}` : `${side.lineCount} lines`
+  if (side.error) return `Line ${side.error.line} · ${side.error.message}`
+  return side.empty ? '' : `${side.lineCount} lines`
 }
 
 function Pane(props: {
@@ -59,6 +37,8 @@ function Pane(props: {
       <header className="pane-head">
         <h2>{title}</h2>
         <span className={result.error ? 'pane-status pane-status-bad' : 'pane-status'}>{status(result)}</span>
+        <PasteButton onPaste={onChange} />
+        <CopyButton text={value} />
         <button className="link" disabled={!!result.error || result.empty} onClick={() => onChange(prettify(value))}>
           Format
         </button>
@@ -160,8 +140,8 @@ function Summary(props: {
 }
 
 export function Compare() {
-  const [left, setLeft] = useState(SAMPLE_LEFT)
-  const [right, setRight] = useState(SAMPLE_RIGHT)
+  const [left, setLeft] = useState('')
+  const [right, setRight] = useState('')
   const [sort, setSort] = useState(false)
   const [filter, setFilter] = useState('')
 

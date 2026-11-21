@@ -40,6 +40,13 @@ export const groups: ToolGroup[] = [
         icon: 'stringify',
         component: lazy(() => import('./json/Stringify').then((m) => ({ default: m.Stringify }))),
       },
+      {
+        id: 'parse',
+        name: 'Parse',
+        path: '/parse',
+        icon: 'parse',
+        component: lazy(() => import('./json/Parse').then((m) => ({ default: m.Parse }))),
+      },
     ],
   },
 ]

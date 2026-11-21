@@ -107,18 +107,20 @@ const highlight = syntaxHighlighting(
 export function Editor({ value, onChange, marks, label, placeholderText, readOnly = false, wrap = false }: Props) {
   const host = useRef<HTMLDivElement>(null)
   const view = useRef<EditorView | null>(null)
-  const initial = useRef({ value, marks })
+  // The view is rebuilt when its options change, so it must start from the latest props, not the first ones.
+  const latest = useRef({ value, marks })
   const onChangeRef = useRef(onChange)
 
   useEffect(() => {
     onChangeRef.current = onChange
+    latest.current = { value, marks }
   })
 
   useEffect(() => {
     const v = new EditorView({
       parent: host.current!,
       state: EditorState.create({
-        doc: initial.current.value,
+        doc: latest.current.value,
         extensions: [
           lineNumbers(),
           history(),
@@ -140,7 +142,7 @@ export function Editor({ value, onChange, marks, label, placeholderText, readOnl
         ],
       }),
     })
-    v.dispatch({ effects: setMarks.of(initial.current.marks) })
+    v.dispatch({ effects: setMarks.of(latest.current.marks) })
     view.current = v
     return () => {
       v.destroy()

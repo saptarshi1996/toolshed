@@ -12,8 +12,9 @@ Everything runs in the browser. Nothing you paste is sent to a server.
 | ----- | ---- | ---- | ------ |
 | JSON  | Compare | `/compare` | Available |
 | JSON  | Stringify | `/stringify` | Available |
+| JSON  | Parse | `/parse` | Available |
 
-More JSON tools (parse, format, minify, query, validate) and other groups are planned.
+More JSON tools (format, minify, query, validate) and other groups are planned.
 
 ### JSON Compare
 
@@ -29,10 +30,18 @@ Paste JSON on each side and see exactly what was added, removed, or changed.
 
 Turn a JSON document into an escaped string, ready to paste into code or into another JSON value.
 
-- "Minify first" strips whitespace outside strings before escaping. It works on the text, so key order and number precision are untouched.
-- "Wrap in quotes" keeps or drops the surrounding quotes.
+- The JSON is always minified first (whitespace outside strings is stripped, key order and number precision are untouched) and the result is wrapped in quotes, so there are no options to set.
 - Invalid JSON is reported with its line, and the output stays empty until it is fixed.
 - The output is read-only, wraps long lines, and has a Copy button.
+
+### JSON Parse
+
+The inverse of Stringify: turn an escaped JSON string back into the document it holds.
+
+- The surrounding quotes are optional, and plain JSON that was never escaped is simply formatted.
+- The result is always pretty printed with two-space indentation. It works on the text, so key order and number precision are untouched.
+- If the string decodes but the text inside is not JSON, the decoded text is shown with the line and message of the problem.
+- The output is read-only and has a Copy button.
 
 ## Getting started
 

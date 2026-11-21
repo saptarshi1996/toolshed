@@ -1,13 +1,50 @@
-import { render, screen, within } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import { getEditor, getEditorText, setEditorText } from '../../test/editor'
 import { Compare } from './Compare'
 
+const LEFT = `{
+  "name": "toolshed",
+  "version": "1.4.0",
+  "private": true,
+  "scripts": {
+    "build": "vite build",
+    "test": "vitest"
+  },
+  "tags": ["json", "diff"],
+  "author": { "name": "Ada" }
+}`
+
+const RIGHT = `{
+  "name": "toolshed",
+  "version": "1.5.0",
+  "scripts": {
+    "build": "vite build",
+    "test": "vitest run",
+    "lint": "eslint ."
+  },
+  "tags": ["json", "diff", "cli"],
+  "author": { "name": "Ada Lovelace" }
+}`
+
+function loadSample() {
+  setEditorText('Left JSON', LEFT)
+  setEditorText('Right JSON', RIGHT)
+}
 
 describe('Compare', () => {
-  it('opens with a sample and shows its differences', () => {
+  it('opens with both editors empty and asks for JSON', () => {
     render(<Compare />)
+    expect(getEditorText('Left JSON')).toBe('')
+    expect(getEditorText('Right JSON')).toBe('')
+    expect(screen.getByText('Paste JSON on both sides')).toBeInTheDocument()
+    expect(screen.queryByText(/invalid JSON/)).not.toBeInTheDocument()
+  })
+
+  it('shows the differences between two documents', () => {
+    render(<Compare />)
+    loadSample()
     expect(screen.getByRole('heading', { name: 'Compare JSON' })).toBeInTheDocument()
     expect(screen.getByText('6 differences')).toBeInTheDocument()
     expect(screen.getByText('2 added')).toBeInTheDocument()
@@ -60,6 +97,7 @@ describe('Compare', () => {
 
   it('recovers once the JSON is fixed', () => {
     render(<Compare />)
+    setEditorText('Right JSON', '{"a": 2}')
     setEditorText('Left JSON', '{"a": ')
     expect(screen.getByText(/contains invalid JSON/)).toBeInTheDocument()
     setEditorText('Left JSON', '{"a": 1}')
@@ -69,6 +107,7 @@ describe('Compare', () => {
 
   it('asks for JSON when a side is empty, without showing an error', () => {
     render(<Compare />)
+    loadSample()
     setEditorText('Left JSON', '')
     expect(screen.getByText('Paste JSON on both sides')).toBeInTheDocument()
     expect(screen.queryByText(/invalid JSON/)).not.toBeInTheDocument()
@@ -76,6 +115,7 @@ describe('Compare', () => {
 
   it('tints the changed lines in the editors', () => {
     const { container } = render(<Compare />)
+    loadSample()
     expect(container.querySelectorAll('.cm-line.cm-diff-chg').length).toBeGreaterThan(0)
     expect(container.querySelectorAll('.cm-line.cm-diff-add').length).toBeGreaterThan(0)
     expect(container.querySelectorAll('.cm-line.cm-diff-del').length).toBeGreaterThan(0)
@@ -99,6 +139,7 @@ describe('Compare', () => {
 
   it('disables Format while a side is invalid', () => {
     render(<Compare />)
+    setEditorText('Left JSON', '{"a": 1}')
     setEditorText('Right JSON', '{oops')
     expect(screen.getAllByRole('button', { name: 'Format' })[1]).toBeDisabled()
     expect(screen.getAllByRole('button', { name: 'Format' })[0]).toBeEnabled()
@@ -118,6 +159,7 @@ describe('Compare', () => {
   describe('filtering the differences', () => {
     it('only appears when there are differences', () => {
       render(<Compare />)
+      loadSample()
       expect(screen.getByLabelText('Filter differences')).toBeInTheDocument()
       setEditorText('Right JSON', getEditorText('Left JSON'))
       expect(screen.queryByLabelText('Filter differences')).not.toBeInTheDocument()
@@ -126,6 +168,7 @@ describe('Compare', () => {
     it('narrows the list by path and shows how many match', async () => {
       const user = userEvent.setup()
       render(<Compare />)
+      loadSample()
       await user.type(screen.getByLabelText('Filter differences'), 'scripts')
       expect(screen.getByText('2 of 6')).toBeInTheDocument()
       expect(screen.getByText('scripts.test')).toBeInTheDocument()
@@ -138,6 +181,7 @@ describe('Compare', () => {
     it('also matches values, ignoring case', async () => {
       const user = userEvent.setup()
       render(<Compare />)
+      loadSample()
       await user.type(screen.getByLabelText('Filter differences'), 'LOVELACE')
       expect(screen.getByText('1 of 6')).toBeInTheDocument()
       expect(screen.getByText('author.name')).toBeInTheDocument()
@@ -146,6 +190,7 @@ describe('Compare', () => {
     it('says so when nothing matches, and Escape clears the filter', async () => {
       const user = userEvent.setup()
       render(<Compare />)
+      loadSample()
       const input = screen.getByLabelText('Filter differences')
       await user.type(input, 'nothing-like-this')
       expect(screen.getByText(/No differences match/)).toBeInTheDocument()
@@ -154,6 +199,19 @@ describe('Compare', () => {
       expect(input).toHaveValue('')
       expect(screen.getByText('scripts.test')).toBeInTheDocument()
     })
+  })
+
+  it('pastes from and copies to the clipboard on each side', async () => {
+    const user = userEvent.setup()
+    render(<Compare />)
+    await navigator.clipboard.writeText('{"a": 1}')
+    await user.click(screen.getAllByRole('button', { name: 'Paste' })[1])
+    await waitFor(() => expect(getEditorText('Right JSON')).toBe('{"a": 1}'))
+    expect(getEditorText('Left JSON')).toBe('')
+
+    await user.click(screen.getAllByRole('button', { name: 'Copy' })[1])
+    expect(await navigator.clipboard.readText()).toBe('{"a": 1}')
+    expect(screen.getAllByRole('button', { name: 'Copy' })[0]).toBeDisabled()
   })
 })
 

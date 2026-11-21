@@ -32,6 +32,12 @@ describe('routing', () => {
     expect(within(sidebar()).getByRole('link', { name: 'Stringify' })).toHaveAttribute('aria-current', 'page')
   })
 
+  it('opens Parse at /parse, listed in the sidebar and marked current', async () => {
+    renderAt('/parse')
+    expect(await screen.findByRole('heading', { name: 'Parse JSON' })).toBeInTheDocument()
+    expect(within(sidebar()).getByRole('link', { name: 'Parse' })).toHaveAttribute('aria-current', 'page')
+  })
+
   it('treats a trailing slash as the same page', async () => {
     renderAt('/compare/')
     expect(await screen.findByRole('heading', { name: 'Compare JSON' })).toBeInTheDocument()

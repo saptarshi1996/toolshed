@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-Toolshed is a browser-only developer toolbox (CyberChef-style, with an Apple-like UI). Nothing the user pastes leaves the browser. Live at https://saptarshi1996.github.io/toolshed/. JSON Compare and JSON Stringify exist so far. More JSON tools and other groups are planned (see `README.md`).
+Toolshed is a browser-only developer toolbox (CyberChef-style, with an Apple-like UI). Nothing the user pastes leaves the browser. Live at https://saptarshi1996.github.io/toolshed/. JSON Compare, Stringify and Parse exist so far. More JSON tools and other groups are planned (see `README.md`).
 
 ## Commands
 

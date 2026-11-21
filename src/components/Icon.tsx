@@ -13,6 +13,13 @@ const paths = {
       <path d="M9.5 7.5V11H13V7.5h-2c0-1.4.7-2.2 2-2.5" />
     </>
   ),
+  // Closing quote marks: a string turned back into a document.
+  parse: (
+    <>
+      <path d="M3 5h3.5v3.5H4.5c0 1.4.7 2.2 2 2.5" />
+      <path d="M9.5 5H13v3.5h-2c0 1.4.7 2.2 2 2.5" />
+    </>
+  ),
 }
 
 export type IconName = keyof typeof paths
