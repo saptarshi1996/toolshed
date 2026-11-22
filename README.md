@@ -1,6 +1,6 @@
 # Toolshed
 
-A modern, browser-based toolbox for everyday data work with a clean, Apple-style interface. Every tool has its own URL, so you can bookmark it or share a link.
+A modern, browser-based toolbox for everyday data work with a clean interface. Every tool has its own URL, so you can bookmark it or share a link.
 
 **Live site:** https://saptarshi1996.github.io/toolshed/
 
