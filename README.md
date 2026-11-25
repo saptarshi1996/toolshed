@@ -11,6 +11,7 @@ Everything runs in the browser. Nothing you paste is sent to a server.
 | JSON  | Compare | `/compare` | Available |
 | JSON  | Stringify | `/stringify` | Available |
 | JSON  | Parse | `/parse` | Available |
+| JSON  | To CSV | `/to-csv` | Available |
 
 More JSON tools (format, minify, query, validate) and other groups are planned.
 
@@ -41,6 +42,16 @@ The inverse of Stringify: turn an escaped JSON string back into the document it 
 - If the string decodes but the text inside is not JSON, the decoded text is shown with the line and message of the problem.
 - The output is read-only and has a Copy button.
 
+### JSON to CSV
+
+Paste JSON or upload a file, check the CSV, and download it.
+
+- Only flat JSON is supported. Rows are the items of an array (or the one object, or the array inside `{ "data": [...] }`), and every value must be text, a number, a boolean or null. An object or array inside a row is rejected with the row and key, and an uploaded file like that is not loaded. Rows with different keys share the union of all columns.
+- Pasted JSON is never changed: errors are reported with their line so you can fix them.
+- Uploaded files (also by drag and drop) are cleaned first: byte-order mark, UTF-16, comments, trailing commas, and JSON Lines are handled, and a note says what was changed.
+- Files over about 1 MB open as a read-only preview of their start instead of freezing the editor; the whole file is still converted. The CSV pane previews the first 200 rows, while Copy and Download include every row. Uploads are limited to 100 MB.
+- Download writes UTF-8 with a byte-order mark so Excel reads it correctly, named after the uploaded file.
+
 ## Getting started
 
 ```sh
@@ -59,7 +70,7 @@ npm run dev
 
 ## Tech
 
-React 19, TypeScript, Vite, React Router, and CodeMirror 6 for the editors. Styling is plain CSS with design tokens in `src/index.css` and follows the system light or dark setting. Tests use Vitest and Testing Library.
+React 19, TypeScript, Vite, React Router, and CodeMirror 6 for the editors. Styling is plain CSS with design tokens in `src/index.css` and is dark only. Tests use Vitest and Testing Library.
 
 ## Project structure
 
@@ -78,12 +89,12 @@ src/
 2. If it needs a new icon, add it to `src/components/Icon.tsx`.
 3. Add an entry to `groups` in `src/tools/registry.tsx` with its `name`, `path`, `icon`, and a lazy-loaded `component`.
 
-The sidebar, routes, page title, and search all read from that registry, so nothing else needs wiring. Keep paths unique across groups.
+The sidebar, routes, and page title all read from that registry, so nothing else needs wiring. Keep paths unique across groups.
 
 ## Testing and checks
 
 - Unit tests cover the JSON parsing and diffing logic in `src/lib/`.
-- Integration tests render the app and the Compare page and drive them like a user: routing, the sidebar, search, editing, and the differences list.
+- Integration tests render the app and the Compare page and drive them like a user: routing, the sidebar, editing, and the differences list.
 - Git hooks (Husky) run lint and a build before each commit, and the tests before each push. They are installed automatically by `npm install`.
 
 ## Deployment

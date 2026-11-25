@@ -1,0 +1,73 @@
+/* JSON to CSV reuses the shared tool-page layout in components/ToolPage.css. */
+.pane-drop {
+  box-shadow: var(--shadow), 0 0 0 2px var(--accent);
+}
+
+.pane-note {
+  margin: 0;
+  padding: 7px 18px;
+  border-bottom: 1px solid var(--line);
+  background: var(--fill);
+  color: var(--text2);
+  font-size: 12px;
+}
+
+.pane-note-bad {
+  color: var(--del);
+}
+
+/* Holds an editor and, while it is empty, a hint laid over it. */
+.pane-body {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 24px;
+  text-align: center;
+  pointer-events: none; /* clicks still reach the editor underneath */
+}
+
+.empty .link {
+  margin-top: 10px;
+  pointer-events: auto;
+}
+
+.empty-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 6px;
+  border-radius: 12px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.empty-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.empty h3 {
+  margin: 0;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.empty p {
+  max-width: 300px;
+  margin: 0;
+  color: var(--text2);
+}

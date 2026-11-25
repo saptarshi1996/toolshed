@@ -4,15 +4,11 @@ import { Icon } from './Icon'
 import './Sidebar.css'
 
 interface Props {
-  /** Search text from the top bar; filters the tool list. */
-  query: string
   /** Icon-only rail. */
   collapsed: boolean
 }
 
-export function Sidebar({ query, collapsed }: Props) {
-  const q = query.trim().toLowerCase()
-
+export function Sidebar({ collapsed }: Props) {
   return (
     <aside className="sidebar" id="sidebar" data-collapsed={collapsed}>
       <div className="brand">
@@ -28,13 +24,7 @@ export function Sidebar({ query, collapsed }: Props) {
 
       <nav className="nav" aria-label="Tools">
         {groups.map((group) => {
-          const tools = group.tools.filter(
-            (t) =>
-              !q ||
-              group.name.toLowerCase().includes(q) ||
-              t.name.toLowerCase().includes(q),
-          )
-          if (tools.length === 0) return null
+          const { tools } = group
 
           return (
             <div className="group" key={group.id}>

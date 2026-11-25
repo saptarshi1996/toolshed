@@ -3,72 +3,82 @@
   flex-direction: column;
   min-height: 0;
   background: var(--sidebar);
-  border-right: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  z-index: 1;
 }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 9px;
-  padding: 16px 16px 10px;
+  gap: 10px;
+  padding: 20px 20px 14px;
 }
 
 .brand-logo {
   display: grid;
   place-items: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
-  background: var(--accent);
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: var(--grad);
+  box-shadow: var(--shadow-btn);
   color: #fff;
 }
 
+.brand-logo svg {
+  width: 16px;
+  height: 16px;
+}
+
 .brand-name {
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 700;
   letter-spacing: -0.01em;
 }
 
 .nav {
   flex: 1;
   overflow: auto;
-  padding: 4px 10px 12px;
+  padding: 6px 12px 16px;
 }
 
 .group-head {
   display: flex;
   align-items: center;
-  gap: 9px;
-  margin: 0;
-  padding: 6px 8px;
-  font-size: inherit;
-  font-weight: 600;
+  gap: 8px;
+  margin: 10px 0 4px;
+  padding: 4px 8px;
+  color: var(--text3);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .tile {
-  display: grid;
+  display: none; /* the glyph only shows when the sidebar is a rail */
   place-items: center;
   flex: none;
-  width: 20px;
-  height: 20px;
-  color: var(--text2);
-  font: 600 11px var(--mono);
+  color: var(--text3);
+  font: 700 11px var(--mono);
+  letter-spacing: 0;
 }
 
 .tools {
   list-style: none;
   margin: 0;
-  padding: 2px 0 6px 37px;
+  padding: 0;
 }
 
 .tool {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 12px;
   width: 100%;
-  padding: 5px 8px;
-  border-radius: 7px;
+  padding: 7px 8px;
+  border-radius: 8px;
   color: var(--text2);
+  font-weight: 600;
   text-align: left;
   text-decoration: none;
 }
@@ -78,16 +88,42 @@
   color: var(--text);
 }
 
-.tool[aria-current='page'] {
-  background: var(--accent);
-  color: #fff;
-  font-weight: 500;
+.tool {
+  position: relative;
 }
 
+.tool[aria-current='page'] {
+  background: var(--accent-soft);
+  color: var(--text);
+}
+
+/* The current page is marked with a thin bar on the sidebar's edge. */
+.tool[aria-current='page']::before {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: 6px;
+  bottom: 6px;
+  border-left: 3px solid var(--brand);
+  border-radius: 0 3px 3px 0;
+}
+
+/* The icon sits in a rounded chip; the selected tool's chip takes the gradient. */
 .tool .icon {
   flex: none;
-  width: 20px;
-  height: 16px;
+  width: 30px;
+  height: 30px;
+  padding: 7px;
+  border-radius: 8px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  transition: background 0.15s, color 0.15s;
+}
+
+.tool[aria-current='page'] .icon {
+  background: var(--grad);
+  box-shadow: var(--shadow-btn);
+  color: #fff;
 }
 
 /* Collapsed: icon-only rail. Labels stay in the DOM for screen readers. */
@@ -111,34 +147,27 @@
 
 .sidebar[data-collapsed='true'] .group-head {
   justify-content: center;
+  margin-top: 6px;
   padding-inline: 0;
 }
 
-.sidebar[data-collapsed='true'] .tools {
-  padding-left: 0;
-}
-
-/* Logo and selected tool share one tile shape so the rail lines up. */
-.sidebar[data-collapsed='true'] .brand-logo,
-.sidebar[data-collapsed='true'] .tool {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-}
-
-.sidebar[data-collapsed='true'] .brand-logo svg {
-  width: 16px;
-  height: 16px;
+.sidebar[data-collapsed='true'] .tile {
+  display: grid;
 }
 
 .sidebar[data-collapsed='true'] .tool {
   justify-content: center;
-  margin-inline: auto;
+  width: 36px;
+  height: 36px;
+  margin: 0 auto 4px;
   padding: 0;
+  background: none;
 }
 
-/* In the rail the selected tool gets a neutral fill and an accent icon instead of the blue pill. */
-.sidebar[data-collapsed='true'] .tool[aria-current='page'] {
-  background: var(--fill-strong);
-  color: var(--accent);
+.sidebar[data-collapsed='true'] .tool[aria-current='page']::before {
+  left: -8px;
+}
+
+.sidebar[data-collapsed='true'] .tool:hover {
+  background: var(--hover);
 }

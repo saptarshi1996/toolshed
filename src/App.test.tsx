@@ -128,59 +128,9 @@ describe('collapsing the sidebar', () => {
   })
 })
 
-describe('search', () => {
-  it('filters the sidebar by tool name, ignoring case', async () => {
-    const user = userEvent.setup()
+describe('top bar', () => {
+  it('has no search box', () => {
     renderAt('/compare')
-    await user.type(screen.getByLabelText('Search tools'), 'COMP')
-    expect(within(sidebar()).getByRole('link', { name: 'Compare' })).toBeInTheDocument()
-  })
-
-  it('also matches the group name', async () => {
-    const user = userEvent.setup()
-    renderAt('/compare')
-    await user.type(screen.getByLabelText('Search tools'), 'json')
-    expect(within(sidebar()).getByRole('link', { name: 'Compare' })).toBeInTheDocument()
-  })
-
-  it('hides tools and groups that do not match', async () => {
-    const user = userEvent.setup()
-    renderAt('/compare')
-    await user.type(screen.getByLabelText('Search tools'), 'zzz')
-    expect(within(sidebar()).queryByRole('link')).not.toBeInTheDocument()
-    expect(within(sidebar()).queryByRole('heading', { name: 'JSON' })).not.toBeInTheDocument()
-  })
-
-  it('clears with Escape', async () => {
-    const user = userEvent.setup()
-    renderAt('/compare')
-    const input = screen.getByLabelText('Search tools')
-    await user.type(input, 'zzz')
-    await user.keyboard('{Escape}')
-    expect(input).toHaveValue('')
-    expect(within(sidebar()).getByRole('link', { name: 'Compare' })).toBeInTheDocument()
-  })
-
-  it('focuses with Ctrl+K', async () => {
-    const user = userEvent.setup()
-    renderAt('/compare')
-    expect(screen.getByLabelText('Search tools')).not.toHaveFocus()
-    await user.keyboard('{Control>}k{/Control}')
-    expect(screen.getByLabelText('Search tools')).toHaveFocus()
-  })
-
-  it('focuses with Cmd+K', async () => {
-    const user = userEvent.setup()
-    renderAt('/compare')
-    await user.keyboard('{Meta>}k{/Meta}')
-    expect(screen.getByLabelText('Search tools')).toHaveFocus()
-  })
-
-  it('keeps the page open while searching', async () => {
-    const user = userEvent.setup()
-    renderAt('/compare')
-    await screen.findByRole('heading', { name: 'Compare JSON' })
-    await user.type(screen.getByLabelText('Search tools'), 'zzz')
-    expect(screen.getByRole('heading', { name: 'Compare JSON' })).toBeInTheDocument()
+    expect(screen.queryByLabelText('Search tools')).not.toBeInTheDocument()
   })
 })

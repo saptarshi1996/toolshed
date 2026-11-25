@@ -1,65 +1,31 @@
 .topbar {
-  display: grid;
-  grid-template-columns: 1fr minmax(220px, 420px) 1fr;
+  display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 18px;
-  border-bottom: 1px solid var(--line);
+  padding: 14px 24px;
+  color: var(--on-hero);
+}
+
+.topbar :focus-visible {
+  outline-color: #fff;
 }
 
 .crumb {
-  color: var(--text2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--on-hero-soft);
+  font-size: 13px;
   white-space: nowrap;
 }
 
 .crumb b {
-  color: var(--text);
+  color: var(--on-hero);
   font-weight: 600;
 }
 
 .crumb-sep {
   opacity: 0.5;
 }
-
-.search {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 10px;
-  border-radius: 9px;
-  background: var(--fill);
-  color: var(--text2);
-}
-
-.search:focus-within {
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.search input {
-  flex: 1;
-  min-width: 0;
-  background: none;
-  border: 0;
-  outline: 0;
-  color: var(--text);
-}
-
-.search input::placeholder {
-  color: var(--text2);
-}
-
-.search input::-webkit-search-cancel-button {
-  display: none;
-}
-
-kbd {
-  padding: 0 5px;
-  border: 1px solid var(--line);
-  border-radius: 5px;
-  color: var(--text2);
-  font: 500 11px var(--sans);
-}
-
 
 .topbar-start {
   display: flex;
@@ -74,23 +40,20 @@ kbd {
   flex: none;
   width: 28px;
   height: 28px;
-  border-radius: 7px;
-  color: var(--text2);
+  border-radius: 8px;
+  color: var(--on-hero);
 }
 
 .icon-btn:hover {
-  background: var(--hover);
-  color: var(--text);
+  background: rgba(255, 255, 255, 0.18);
 }
 
-@media (max-width: 760px) {
+@media (max-width: 1000px) {
   .topbar {
-    grid-template-columns: auto minmax(0, 1fr);
-    padding-inline: 12px;
+    padding-inline: 14px;
   }
 
-  .crumb,
-  kbd {
+  .crumb {
     display: none;
   }
 }

@@ -47,6 +47,13 @@ export const groups: ToolGroup[] = [
         icon: 'parse',
         component: lazy(() => import('./json/Parse').then((m) => ({ default: m.Parse }))),
       },
+      {
+        id: 'to-csv',
+        name: 'To CSV',
+        path: '/to-csv',
+        icon: 'csv',
+        component: lazy(() => import('./json/ToCsv').then((m) => ({ default: m.ToCsv }))),
+      },
     ],
   },
 ]

@@ -10,10 +10,25 @@
 }
 
 .main {
+  position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   min-width: 0;
   min-height: 0;
+  background: var(--bg);
+}
+
+/* The gradient header the cards float over. */
+.main::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: -1;
+  height: 232px;
+  background: var(--band);
+  /* Fades out so there is no colour seam behind or between the cards. */
+  mask-image: linear-gradient(to bottom, #000 45%, transparent 100%);
 }
 
 .body {
@@ -29,13 +44,17 @@
 }
 
 .not-found {
-  padding: 48px 22px;
+  margin: 28px 24px;
+  padding: 28px;
+  background: var(--panel);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
 }
 
 .not-found h1 {
   margin: 0 0 6px;
   font-size: 22px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: -0.02em;
 }
 
@@ -46,5 +65,6 @@
 
 .not-found a {
   color: var(--accent);
+  font-weight: 600;
   text-decoration: none;
 }

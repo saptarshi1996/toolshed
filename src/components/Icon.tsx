@@ -20,6 +20,13 @@ const paths = {
       <path d="M9.5 5H13v3.5h-2c0 1.4.7 2.2 2 2.5" />
     </>
   ),
+  // A small table: rows and columns.
+  csv: (
+    <>
+      <rect x="2.5" y="3" width="11" height="10" rx="1.5" />
+      <path d="M2.5 6.5h11M6.5 3v10" />
+    </>
+  ),
 }
 
 export type IconName = keyof typeof paths

@@ -27,6 +27,8 @@ interface Props {
   readOnly?: boolean
   /** Wrap long lines instead of scrolling sideways. */
   wrap?: boolean
+  /** Not JSON: no syntax colors or bracket matching (for CSV and other plain text). */
+  plain?: boolean
 }
 
 class MarkGutter extends GutterMarker {
@@ -104,7 +106,7 @@ const highlight = syntaxHighlighting(
   ]),
 )
 
-export function Editor({ value, onChange, marks, label, placeholderText, readOnly = false, wrap = false }: Props) {
+export function Editor({ value, onChange, marks, label, placeholderText, readOnly = false, wrap = false, plain = false }: Props) {
   const host = useRef<HTMLDivElement>(null)
   const view = useRef<EditorView | null>(null)
   // The view is rebuilt when its options change, so it must start from the latest props, not the first ones.
@@ -125,9 +127,7 @@ export function Editor({ value, onChange, marks, label, placeholderText, readOnl
           lineNumbers(),
           history(),
           keymap.of([...defaultKeymap, ...historyKeymap]),
-          json(),
-          highlight,
-          bracketMatching(),
+          plain ? [] : [json(), highlight, bracketMatching()],
           indentUnit.of('  '),
           EditorState.tabSize.of(2),
           markField,
@@ -148,7 +148,7 @@ export function Editor({ value, onChange, marks, label, placeholderText, readOnl
       v.destroy()
       view.current = null
     }
-  }, [label, placeholderText, readOnly, wrap])
+  }, [label, placeholderText, readOnly, wrap, plain])
 
   // Replace the document when the value is changed from outside (Format, Clear).
   useEffect(() => {

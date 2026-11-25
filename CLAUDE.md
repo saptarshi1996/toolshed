@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-Toolshed is a browser-only developer toolbox with a clean UI. Nothing the user pastes leaves the browser. JSON Compare, Stringify and Parse exist so far. More JSON tools and other groups are planned (see `README.md`).
+Toolshed is a browser-only developer toolbox with a clean UI. Nothing the user pastes leaves the browser. JSON Compare, Stringify, Parse and To CSV exist so far. More JSON tools and other groups are planned (see `README.md`).
 
 ## Commands
 
@@ -20,7 +20,7 @@ Node version is pinned in `.nvmrc`. Husky runs `lint` + `build` on pre-commit an
 
 ## Architecture
 
-**Tool registry drives everything.** `src/tools/registry.tsx` holds `groups` (each with `tools`). The sidebar, the routes in `App.tsx`, the document title, and the sidebar search are all derived from it, so adding a tool means adding a registry entry (lazy-loaded `component`, unique `path`, an `icon` key from `components/Icon.tsx`) and nothing else. See "Adding a tool" in `README.md`.
+**Tool registry drives everything.** `src/tools/registry.tsx` holds `groups` (each with `tools`). The sidebar, the routes in `App.tsx`, and the document title are all derived from it, so adding a tool means adding a registry entry (lazy-loaded `component`, unique `path`, an `icon` key from `components/Icon.tsx`) and nothing else. See "Adding a tool" in `README.md`.
 
 **Shared page layout** (header, switches, side-by-side panes, narrow-window stacking) lives in `src/components/ToolPage.css` (`tool-page`, `tool-head`, `panes`, `pane`...). New tools import it instead of redefining it. `Editor` takes `readOnly` and `wrap` for output panes.
 
@@ -35,7 +35,9 @@ Node version is pinned in `.nvmrc`. Husky runs `lint` + `build` on pre-commit an
 
 **Paths**: `keyPath` produces `a.b` for identifier keys and `a["odd key"]` otherwise, so keys containing dots or brackets don't collide. Objects from `parseJson` use `Object.create(null)`.
 
-**Editor** (`components/Editor.tsx`) wraps CodeMirror 6 imperatively. The `EditorView` is created once; `value` and `marks` flow in through effects, and diff line/gutter tinting is a `StateField` fed by a `setMarks` effect. Styling uses CSS variables from `src/index.css` (design tokens, system light/dark).
+**JSON to CSV** (`src/tools/json/ToCsv.tsx`): `lib/jsonSanitize.ts` (uploads only) and `lib/jsonCsv.ts` are pure. Files over `EDITABLE_CHARS` are held in a `large` state and the editor gets a read-only `previewOf` slice, so the full text is what gets converted but never rendered. Above 2M characters `jsonToCsv` uses `JSON.parse` instead of the line-tracking `parseJson`. CodeMirror normalizes line breaks to `\n`, so editor text has no `\r`; Copy and Download use the CRLF string.
+
+**Editor** (`components/Editor.tsx`) wraps CodeMirror 6 imperatively. The `EditorView` is created once; `value` and `marks` flow in through effects, and diff line/gutter tinting is a `StateField` fed by a `setMarks` effect. Styling uses CSS variables from `src/index.css` (design tokens; the theme is dark only).
 
 ## Testing
 

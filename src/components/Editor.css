@@ -1,5 +1,6 @@
 .editor {
   flex: 1;
+  background: rgba(0, 0, 0, 0.22); /* a darker well under the card header */
   min-height: 0;
   overflow: hidden;
 }

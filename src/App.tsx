@@ -8,7 +8,6 @@ import './App.css'
 const NARROW = '(max-width: 900px)'
 
 function Layout() {
-  const [query, setQuery] = useState('')
   // Starts collapsed on narrow screens, and follows the window when it crosses the breakpoint.
   const [collapsed, setCollapsed] = useState(() => matchMedia(NARROW).matches)
   const { pathname } = useLocation()
@@ -27,14 +26,9 @@ function Layout() {
 
   return (
     <div className="app" data-collapsed={collapsed}>
-      <Sidebar query={query} collapsed={collapsed} />
+      <Sidebar collapsed={collapsed} />
       <div className="main">
-        <TopBar
-          query={query}
-          onQueryChange={setQuery}
-          sidebarCollapsed={collapsed}
-          onToggleSidebar={() => setCollapsed((c) => !c)}
-        />
+        <TopBar sidebarCollapsed={collapsed} onToggleSidebar={() => setCollapsed((c) => !c)} />
         <main className="body">
           <Suspense fallback={null}>
             <Outlet />

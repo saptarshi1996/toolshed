@@ -22,7 +22,7 @@ function prettify(text: string) {
 
 function status(side: SideResult) {
   if (side.error) return `Line ${side.error.line} · ${side.error.message}`
-  return side.empty ? '' : `${side.lineCount} lines`
+  return side.empty ? '' : `${side.lineCount} ${side.lineCount === 1 ? 'line' : 'lines'}`
 }
 
 function Pane(props: {
