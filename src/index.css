@@ -1,33 +1,39 @@
 :root {
   /* Surfaces, from darkest to lightest: page < sidebar < card < raised. */
-  --bg: #0b0e17;
-  --sidebar: #0f1320;
-  --panel: #161b2b;
-  --raised: #20273d;
-  --line: rgba(255, 255, 255, 0.09);
+  --bg: #0b1020;
+  --sidebar: #0d1429;
+  --panel: #121a31;
+  --raised: #1a2445;
+  --raised-h: #243060;
+  --field: #0a1022;
+  --line: #222d4d;
+  --edge: #3a4670;
 
-  --text: #f6f9fc;
-  --text2: #b9c2d6;
-  --text3: #8898aa;
+  --text: #e6eaf8;
+  --text2: #b9c2de;
+  --text3: #8995b8;
 
   /* --brand fills buttons and chips; --accent is the lighter shade used for text and rings on dark. */
   --brand: #5e72e4;
-  --accent: #a3afff;
-  --accent-soft: rgba(154, 168, 255, 0.16);
+  --accent: #94a2f7;
+  --accent-soft: rgba(94, 114, 228, 0.2);
+  --teal: #11cdef;
   --hover: rgba(255, 255, 255, 0.05);
   --fill: rgba(255, 255, 255, 0.04);
   --fill-strong: rgba(255, 255, 255, 0.14);
-  --grad: linear-gradient(87deg, #5e72e4 0%, #825ee4 100%);
+  --grad: linear-gradient(180deg, #6c80ee 0%, #5e72e4 100%);
 
   /* The band behind the top bar and page title. */
-  --band: linear-gradient(87deg, #1d2a57 0%, #2a2263 100%);
+  --band:
+    radial-gradient(900px 260px at 100% 0, rgba(17, 205, 239, 0.38), transparent 70%),
+    linear-gradient(120deg, #2a3a9c 0%, #4558c9 45%, #3a6fc4 100%);
   --on-hero: #ffffff;
   --on-hero-soft: rgba(255, 255, 255, 0.78);
 
-  --shadow: 0 0 0 1px rgba(255, 255, 255, 0.07), 0 8px 28px rgba(0, 0, 0, 0.45);
-  --shadow-btn: 0 4px 6px rgba(8, 8, 30, 0.4), 0 1px 3px rgba(0, 0, 0, 0.3);
-  --shadow-lift: 0 7px 14px rgba(8, 8, 30, 0.45), 0 3px 6px rgba(0, 0, 0, 0.3);
-  --radius: 6px;
+  --shadow: 0 0 0 1px rgba(255, 255, 255, 0.04), 0 10px 30px rgba(2, 5, 18, 0.55);
+  --shadow-btn: 0 4px 10px rgba(94, 114, 228, 0.35), 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-lift: 0 8px 16px rgba(94, 114, 228, 0.4), 0 2px 4px rgba(0, 0, 0, 0.4);
+  --radius: 10px;
 
   --ok: #2dce89;
   --add: #2dce89;
@@ -83,7 +89,7 @@ button {
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 1px;
+  outline: 1px solid var(--accent);
+  outline-offset: 2px;
   border-radius: 6px;
 }
